@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "751390474259",
+    "firebase_url": "https://lunch-box-a7fd6.firebaseio.com",
+    "project_id": "lunch-box-a7fd6",
+    "storage_bucket": "lunch-box-a7fd6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:751390474259:android:85f1e6d8c610975a8bffe6",
+        "android_client_info": {
+          "package_name": "com.example.flutterLunchApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "751390474259-3uv8iau567q7r7bpltmun5jf6ihbrhdu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH-AdJcNEat7SzIPxVZF0oDz6YICED1jc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "751390474259-3uv8iau567q7r7bpltmun5jf6ihbrhdu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "751390474259-14ee54ri30iogerg5jni9rt2ed6vdkcb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterLunchApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
