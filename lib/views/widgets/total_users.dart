@@ -1,8 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterLunchApp/business_logic/providers/auth_provider.dart';
-import 'package:provider/provider.dart';
 
 class TotalUsers extends StatefulWidget {
   @override
@@ -12,9 +9,6 @@ class TotalUsers extends StatefulWidget {
 class _TotalUsersState extends State<TotalUsers> {
   @override
   Widget build(BuildContext context) {
-    // final userList = Provider.of<AuthProvider>(context).users;
-    // print(userList);
-    final user = FirebaseAuth.instance.currentUser;
     return StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("users")
@@ -32,7 +26,10 @@ class _TotalUsersState extends State<TotalUsers> {
                 Expanded(
                   child: ListView.builder(
                     itemBuilder: (context, index) => ListTile(
-                      leading: CircleAvatar(),
+                      leading: CircleAvatar(
+                        backgroundImage:
+                            NetworkImage(userDocs[index].data()['photoUrl']),
+                      ),
                       title: Text(userDocs[index].data()['displayName']),
                       trailing: Text(userDocs[index].data()['tag']),
                     ),
@@ -48,14 +45,14 @@ class _TotalUsersState extends State<TotalUsers> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                          'Total:',
+                          'Total Users:',
                           style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontSize: 30,
                               fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          '20',
+                          userDocs.length.toString(),
                           style: TextStyle(
                               color: Theme.of(context).accentColor,
                               fontSize: 30,

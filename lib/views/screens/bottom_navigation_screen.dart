@@ -3,10 +3,6 @@ import 'package:flutterLunchApp/views/screens/home_screen.dart';
 import 'package:flutterLunchApp/views/screens/user_profile.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
-  //  final String userName;
-  // final String userEmail;
-  // BottomNavigationScreen(this.userName, this.userEmail);
-
   static const routeName = 'bottom-navigation';
   @override
   _BottomNavigationScreenState createState() => _BottomNavigationScreenState();

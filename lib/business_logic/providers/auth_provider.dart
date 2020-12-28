@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterLunchApp/business_logic/models/user.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -31,44 +35,32 @@ class AuthProvider with ChangeNotifier {
       return newUser;
     } catch (e) {
       print("Error on the new user registration = " + e.toString());
-
       notifyListeners();
       return null;
     }
   }
 
-  // Method for new user registration using email and password
-  Future<UserModel> registerWithEmailAndPassword(
-      String email,
-      String password,
-      String displayName,
-      String reminder,
-      int setTime,
-      int selectedValue) async {
+  Future<UserModel> registerWithEmailAndPassword(String email, String password,
+      String displayName, File image, context) async {
     try {
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('Users_images')
+          .child(result.user.uid + '.jpg');
+      await ref.putFile(image).whenComplete(() {
+        print(image);
+      });
+      final url = await ref.getDownloadURL();
       await _firestore.collection('users').doc(result.user.uid).set({
         'uid': result.user.uid,
         'email': email,
         'displayName': displayName,
-        'photoUrl': result.user.photoURL,
+        'photoUrl': url,
         'tag': "present",
         'createdAt': Timestamp.now(),
-      }).then((value) async {
-        await _firestore
-            .collection('users')
-            .doc(result.user.uid)
-            .collection('reminders')
-            .doc(result.user.uid)
-            .set({
-          'remindertext': reminder,
-          'setTime': setTime,
-          'selectedValue': selectedValue,
-        });
       });
-
       return _userFromFirebase(result.user);
     } catch (e) {
       print("Error on the new user registration = " + e.toString());
@@ -88,14 +80,17 @@ class AuthProvider with ChangeNotifier {
       return true;
     } catch (e) {
       print("Error on the sign in = " + e.toString());
-
       notifyListeners();
       return false;
     }
   }
 
-  Future updateName(String displayName, String email) {
-    _auth.currentUser;
+  Future updateUser(String displayName, String email) async {
+    final User user = _auth.currentUser;
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      'displayName': displayName,
+      'email': email,
+    });
   }
 
   Future signOut() async {
@@ -105,14 +100,8 @@ class AuthProvider with ChangeNotifier {
     return Future.delayed(Duration.zero);
   }
 
-  // void getData() {
-  //   var userName = '';
-  //   var tag = '';
-  //   final User user = _auth.currentUser;
-  //   _firestore.collection("users").doc(user.uid).get().then((value) {
-  //     userName = value.data()["displayName"];
-  //     tag = value.data()["tag"];
-  //     notifyListeners();
-  //   });
-  // }
+  Future<void> getData() async {
+    FirebaseFirestore.instance.collection('users').doc().snapshots();
+    notifyListeners();
+  }
 }

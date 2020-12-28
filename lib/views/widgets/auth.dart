@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutterLunchApp/business_logic/providers/auth_provider.dart';
 import 'package:flutterLunchApp/views/screens/reminder_screen.dart';
+import 'package:flutterLunchApp/views/widgets/user_image_picker.dart';
 import 'package:provider/provider.dart';
 
 class AuthForm extends StatefulWidget {
@@ -18,58 +21,42 @@ class _AuthFormState extends State<AuthForm> {
   var email = '';
   var password = '';
   var displayName = '';
+  File _userImageFile;
 
   @override
   Widget build(BuildContext context) {
+    void _pickedImage(File image) {
+      _userImageFile = image;
+    }
+
     Future<void> _trySubmit() async {
       email = _emailController.text;
       password = _passwordController.text;
       displayName = _userNameController.text;
-
-      if (!_formKey.currentState.validate()) {
-        // Invalid!
-        return null;
+      final isValid = _formKey.currentState.validate();
+      FocusScope.of(context).unfocus();
+      if (_userImageFile == null && !_isLogin) {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text('Please pick an image'),
+          backgroundColor: Theme.of(context).errorColor,
+        ));
+        return;
       }
-      _formKey.currentState.save();
-      final _authProvider = Provider.of<AuthProvider>(context, listen: false);
-      try {
-        if (_isLogin) {
-          await _authProvider.signInWithEmailAndPassword(email, password);
-        } else {
-          Navigator.pushNamed(context, ReminderScreen.routeName,
-              arguments: Arguments(
-                  email: email,
-                  password: password,
-                  userName: displayName,
-                  isLogin: _isLogin));
+      if (isValid) {
+        _formKey.currentState.save();
+        final _authProvider = Provider.of<AuthProvider>(context, listen: false);
+        try {
+          if (_isLogin) {
+            await _authProvider.signInWithEmailAndPassword(email, password);
+          } else {
+            await _authProvider.registerWithEmailAndPassword(
+                email, password, displayName, _userImageFile, context);
+          }
+        } catch (e) {
+          print(e.toString());
         }
-      } catch (e) {
-        print(e.toString());
       }
     }
-    //   _formKey.currentState.save();
-    //
-    // Future<void> _trySubmit() async {
-    //   email = _emailController.text;
-    //   password = _passwordController.text;
-    //   displayName = _userNameController.text;
-    //   if (!_formKey.currentState.validate()) {
-    //     // Invalid!
-    //     return null;
-    //   }
-    //   _formKey.currentState.save();
-    //   final _authProvider = Provider.of<AuthProvider>(context, listen: false);
-    //   try {
-    //     if (_isLogin) {
-    //       await _authProvider.signInWithEmailAndPassword(email, password);
-    //     } else {
-    //       await _authProvider.registerWithEmailAndPassword(
-    //           email, password, displayName);
-    //     }
-    //   } catch (e) {
-    //     print(e.toString());
-    //   }
-    // }
 
     return Scaffold(
       body: Container(
@@ -90,18 +77,7 @@ class _AuthFormState extends State<AuthForm> {
                           size: 50,
                           color: Colors.white,
                         )
-                      : CircleAvatar(
-                          radius: 40,
-                        ),
-                  _isLogin ? SizedBox(height: 30.0) : Container(),
-                  // if (!_islogin) UserImagePicker(_pickedImage),
-                  !_isLogin
-                      ? FlatButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.camera),
-                          label: Text('take picture here!'),
-                        )
-                      : Container(),
+                      : UserImagePicker(_pickedImage),
                   Form(
                     key: _formKey,
                     child: Container(
@@ -237,8 +213,8 @@ class _AuthFormState extends State<AuthForm> {
                             color: Theme.of(context).accentColor,
                             onPressed: _trySubmit,
                             child: Text(
-                              // _isLogin ? 'login' : 'SignUp',
-                              _isLogin ? 'login' : 'next',
+                              _isLogin ? 'login' : 'SignUp',
+                              // _isLogin ? 'login' : 'next',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Theme.of(context).primaryColor),
