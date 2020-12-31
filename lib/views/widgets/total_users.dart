@@ -25,13 +25,17 @@ class _TotalUsersState extends State<TotalUsers> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemBuilder: (context, index) => ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(userDocs[index].data()['photoUrl']),
+                    itemBuilder: (context, index) => Card(
+                      color: Theme.of(context).primaryColor,
+                      elevation: 6.0,
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              NetworkImage(userDocs[index].data()['photoUrl']),
+                        ),
+                        title: Text(userDocs[index].data()['displayName']),
+                        trailing: Text(userDocs[index].data()['tag']),
                       ),
-                      title: Text(userDocs[index].data()['displayName']),
-                      trailing: Text(userDocs[index].data()['tag']),
                     ),
                     itemCount: userDocs.length,
                   ),
@@ -40,7 +44,8 @@ class _TotalUsersState extends State<TotalUsers> {
                   height: 50,
                   width: 400,
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black, width: 1)),
+                      border: Border.all(
+                          color: Theme.of(context).primaryColor, width: 1)),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -54,7 +59,7 @@ class _TotalUsersState extends State<TotalUsers> {
                         Text(
                           userDocs.length.toString(),
                           style: TextStyle(
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).primaryColor,
                               fontSize: 30,
                               fontWeight: FontWeight.bold),
                         ),

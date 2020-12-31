@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutterLunchApp/business_logic/models/user.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -85,12 +84,23 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future updateUser(String displayName, String email) async {
+  Future<void> updateUser(String displayName, String email, File image) async {
     final User user = _auth.currentUser;
-    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-      'displayName': displayName,
-      'email': email,
-    });
+    try {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('Users_images')
+          .child(user.uid + '.jpg');
+      await ref.putFile(image).whenComplete(() {
+        print(image);
+      });
+      final url = await ref.getDownloadURL();
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update(
+          {'displayName': displayName, 'email': email, 'photoUrl': url});
+      notifyListeners();
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future signOut() async {
